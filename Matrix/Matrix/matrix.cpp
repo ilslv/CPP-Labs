@@ -1,7 +1,6 @@
 #include "matrix.h"
 #include <string>
 
-
 Matrix::Matrix(const int x, const int y)
 {
 	x_ = x;
@@ -12,6 +11,7 @@ Matrix::Matrix(const int x, const int y)
 		array_[i] = new int[y];
 	}
 }
+
 Matrix::Matrix(const int x, const int y, const int value)
 {
 	x_ = x;
@@ -26,20 +26,24 @@ Matrix::Matrix(const int x, const int y, const int value)
 		}
 	}
 }
+
 Matrix::Matrix(Matrix const& m)
 {
 	copy(m);
 }
+
 Matrix::Matrix(Matrix&& m) noexcept
 {
 	x_ = m.x_;
 	y_ = m.y_;
 	array_ = m.array_;
 }
+
 int* Matrix::operator[](const int i) const
 {
 	return array_[i];
 }
+
 void Matrix::resize(int const x, int const y)
 {
 	auto **array = new int*[x];
@@ -59,6 +63,7 @@ void Matrix::resize(int const x, int const y)
 	delete array_;
 	array_ = array;
 }
+
 void Matrix::resize(int const x, int const y, int const value)
 {
 	auto **array = new int*[x];
@@ -89,11 +94,11 @@ Matrix& Matrix::operator=(Matrix const& m)
 	return *this;
 }
 
-Matrix Matrix::operator+(Matrix const & m) const
+Matrix Matrix::operator+(Matrix const& m) const
 {
 	if (x_ == m.x_ && y_ == m.y_)
 	{
-		const auto res = std::make_unique<Matrix>(x_, y_);
+		const auto res = new Matrix(x_, y_);
 		for (auto i = 0; i < x_; i++)
 		{
 			for (auto j = 0; j < y_; j++)
@@ -101,7 +106,7 @@ Matrix Matrix::operator+(Matrix const & m) const
 				(*res)[i][j] = array_[i][j] + m.array_[i][j];
 			}
 		}
-		return *res;
+		return Matrix(std::move(*res));
 	}
 	throw std::invalid_argument("Dimensions must be equal!");
 }
@@ -110,7 +115,7 @@ Matrix Matrix::operator*(Matrix const& m) const
 {
 	if (y_ == m.x_)
 	{
-		const auto res = std::make_unique<Matrix>(x_, m.y_, 0);
+		const auto res = new Matrix(x_, m.y_, 0);
 		for (auto i = 0; i < x_; i++)
 		{
 			for (auto j = 0; j < m.y_; j++)
@@ -121,11 +126,10 @@ Matrix Matrix::operator*(Matrix const& m) const
 				}
 			}
 		}
-		return *res;
+		return Matrix(std::move(*res));
 	}
 	throw std::invalid_argument("Wrong dimensions!");
 }
-
 
 int Matrix::getDimensions(int const d) const
 {
@@ -149,6 +153,7 @@ int Matrix::max() const
 	}
 	return a;
 }
+
 int Matrix::min() const
 {
 	auto a = array_[0][0];
@@ -164,6 +169,7 @@ int Matrix::min() const
 	}
 	return a;
 }
+
 int Matrix::number_of_entries(const int a) const
 {
 	auto n = 0;
@@ -195,12 +201,14 @@ void Matrix::copy(Matrix const& m)
 	}
 }
 
-
 Matrix::~Matrix()
 {
-	delete array_;
+	for (auto i = 0; i < x_; i++)
+	{
+		delete[] array_[i];
+	}
+	delete[] array_;
 }
-
 
 std::ostream& operator<<(std::ostream& out, Matrix const & m)
 {
