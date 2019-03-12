@@ -37,6 +37,7 @@ Matrix::Matrix(Matrix&& m) noexcept
 	x_ = m.x_;
 	y_ = m.y_;
 	array_ = m.array_;
+	m.array_ = nullptr;
 }
 
 int* Matrix::operator[](const int i) const
@@ -203,6 +204,10 @@ void Matrix::copy(Matrix const& m)
 
 Matrix::~Matrix()
 {
+	if(array_ == nullptr)
+	{
+		return;
+	}
 	for (auto i = 0; i < x_; i++)
 	{
 		delete[] array_[i];
