@@ -99,15 +99,15 @@ Matrix Matrix::operator+(Matrix const& m) const
 {
 	if (x_ == m.x_ && y_ == m.y_)
 	{
-		const auto res = new Matrix(x_, y_);
+		Matrix res(x_, y_);
 		for (auto i = 0; i < x_; i++)
 		{
 			for (auto j = 0; j < y_; j++)
 			{
-				(*res)[i][j] = array_[i][j] + m.array_[i][j];
+				res[i][j] = array_[i][j] + m.array_[i][j];
 			}
 		}
-		return Matrix(std::move(*res));
+		return res;
 	}
 	throw std::invalid_argument("Dimensions must be equal!");
 }
@@ -116,18 +116,18 @@ Matrix Matrix::operator*(Matrix const& m) const
 {
 	if (y_ == m.x_)
 	{
-		const auto res = new Matrix(x_, m.y_, 0);
+		Matrix res(x_, m.y_, 0);
 		for (auto i = 0; i < x_; i++)
 		{
 			for (auto j = 0; j < m.y_; j++)
 			{
 				for (auto a = 0; a < y_; a++)
 				{
-					(*res)[i][j] += array_[i][a] * m.array_[a][j];
+					res[i][j] += array_[i][a] * m.array_[a][j];
 				}
 			}
 		}
-		return Matrix(std::move(*res));
+		return res;
 	}
 	throw std::invalid_argument("Wrong dimensions!");
 }
