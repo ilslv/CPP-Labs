@@ -45,7 +45,7 @@ void Agency::read(const char* filename)
 	file.close();
 }
 
-event Agency::operator>>(const event e)
+event Agency::operator<<(const event e)
 {
 	const auto res = new event[n_ + 1];
 	for(auto i=0; i<n_; i++)

@@ -19,7 +19,7 @@ public:
 	Agency(Agency&&) = delete;
 	virtual ~Agency();
 	void read(const char* filename);
-	event operator>>(event);
+	event operator<<(event);
 	event operator[](int) const;
 	int get_tickets_amount(int) const;
 	void book_ticket(int) const;
