@@ -10,6 +10,10 @@ Agency::Agency()
 
 Agency::~Agency()
 {
+	for(auto i=0; i<n_; i++)
+	{
+		delete[] events_[i].name;
+	}
 	delete[] events_;
 }
 
