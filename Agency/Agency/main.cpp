@@ -4,7 +4,11 @@
 int main()
 {
 	Agency a;
-	a.read("concerts.csv");
+	std::ifstream file("concerts.csv");
+	while(!file.eof())
+	{
+		file >> a;
+	}
 	a.sort_by_date();
 	std::cout << a;
 	system("pause");
