@@ -28,23 +28,15 @@ void Agency::read(const char* filename)
 	{
 		char line[300];
 		file.getline(line, 300);
-		auto s = strtok(line, ";");
 		events_[i].name = new char[100];
-		strcpy(events_[i].name, s);
-		s = strtok(nullptr, ";");
-		events_[i].tickets_amount = strtol(s, nullptr, 10);
-		s = strtok(nullptr, ";");
-		events_[i].tickets_left = strtol(s, nullptr, 10);
-		s = strtok(nullptr, "-");
-		events_[i].date.tm_year = strtol(s, nullptr, 10) - 1900;
-		s = strtok(nullptr, "-");
-		events_[i].date.tm_mon = strtol(s, nullptr, 10) - 1;
-		s = strtok(nullptr, " ");
-		events_[i].date.tm_mday = strtol(s, nullptr, 10);
-		s = strtok(nullptr, ":");
-		events_[i].date.tm_hour = strtol(s, nullptr, 10);
-		s = strtok(nullptr, "\n");
-		events_[i].date.tm_min = strtol(s, nullptr, 10);
+		strcpy(events_[i].name, strtok(line, ";"));
+		events_[i].tickets_amount = strtol(strtok(nullptr, ";"), nullptr, 10);
+		events_[i].tickets_left = strtol(strtok(nullptr, ";"), nullptr, 10);
+		events_[i].date.tm_year = strtol(strtok(nullptr, "-"), nullptr, 10) - 1900;
+		events_[i].date.tm_mon = strtol(strtok(nullptr, "-"), nullptr, 10) - 1;
+		events_[i].date.tm_mday = strtol(strtok(nullptr, " "), nullptr, 10);
+		events_[i].date.tm_hour = strtol(strtok(nullptr, ":"), nullptr, 10);
+		events_[i].date.tm_min = strtol(strtok(nullptr, "\n"), nullptr, 10);
 	}
 	file.close();
 }
@@ -93,9 +85,9 @@ void Agency::sort_by_name() const
 
 void Agency::sort_by_date() const
 {
-	qsort(events_, n_, sizeof(event), [](const void* d1, const void* d2) -> int
+	qsort(events_, n_, sizeof(events_[0]), [](const void* d1, const void* d2) -> int
 	{
-		return mktime((tm*)d1) > mktime((tm*)d2);
+		return mktime((tm*)d1) < mktime((tm*)d2);
 	});
 }
 
