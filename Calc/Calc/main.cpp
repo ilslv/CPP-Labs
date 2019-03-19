@@ -8,7 +8,7 @@ processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 #include <string>
 #include <bitset>
 
-// 0-9, . 10, + 11, - 12, * 13, / 14, = 15, C 16, CE 17, ± 18, ⌫ 19, ~ 20, and 21, or 22, xor 23, >> 24, << 25 
+// 0-9, . 10, + 11, - 12, * 13, / 14, = 15, C 16, CE 17, ± 18, ⌫ 19, ~ 20, and 21, or 22, xor 23, >> 24, << 25, ^ 26
 
 bool isInt(const double x)
 {
@@ -70,6 +70,11 @@ public:
 			operation_id_ = operation_id;
 			field_ /= _tstof(text);
 
+		}
+		else if (operation_id_ == 16)
+		{
+			operation_id_ = operation_id;
+			field_ = pow(field_, _tstof(text));
 		}
 		else if (isInt(field_) && isInt(text))
 		{
@@ -185,7 +190,12 @@ void addButtons(const HWND h_wnd)
 	CreateWindow(
 		L"Button", L"=",
 		WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
-		50, 250, 100, 50, h_wnd, reinterpret_cast<HMENU>(15), nullptr, nullptr
+		50, 250, 50, 50, h_wnd, reinterpret_cast<HMENU>(15), nullptr, nullptr
+	);
+	CreateWindow(
+		L"Button", L"^",
+		WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+		100, 250, 50, 50, h_wnd, reinterpret_cast<HMENU>(26), nullptr, nullptr
 	);
 	CreateWindow(
 		L"Button", L"CE",
