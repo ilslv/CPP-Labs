@@ -12,6 +12,10 @@ int main()
 	}
 	a.sort_by_date();
 	std::cout << a;
+	for(const auto& e : a)
+	{
+		std::cout << e.name << "\n";
+	}
 	system("pause");
 	return 0;
 }

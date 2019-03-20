@@ -80,3 +80,14 @@ void Agency::sort_by_date()
 		return mktime(&(e1.date)) < mktime(&(e2.date));
 	});
 }
+
+std::vector<event>::iterator Agency::begin()
+{
+	return events_.begin();
+}
+
+std::vector<event>::iterator Agency::end()
+{
+	return events_.end();
+}
+
