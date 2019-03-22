@@ -11,12 +11,11 @@ std::istream& operator>>(std::istream& in, Agency& a)
 	std::string line;
 	std::getline(in, line);
 
-	size_t pos = 0;
 	std::string subs[4];
 
 	for (auto i = 0; i < 3; i++)
 	{
-		pos = line.find(';');
+		const auto pos = line.find(';');
 		subs[i] = line.substr(0, pos);
 		line.erase(0, pos + 1);
 	}
