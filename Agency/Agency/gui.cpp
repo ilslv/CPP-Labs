@@ -25,6 +25,7 @@ int CALLBACK wWinMain(const HINSTANCE hInstance, HINSTANCE, PWSTR lpCmdLine, con
 	{
 		file >> agency;
 	}
+	agency.sort_by_date();
 
 	static HWND SearchControl, OutputControl, FromDateControl, ToDateControl;
 	MSG msg{};
@@ -75,8 +76,8 @@ int CALLBACK wWinMain(const HINSTANCE hInstance, HINSTANCE, PWSTR lpCmdLine, con
 				ss2 >> std::get_time(&(date_to), "%d.%m.%Y");
 				date_from.tm_hour = date_from.tm_min = date_to.tm_hour = date_to.tm_min = 0;
 
-				const auto text_length = GetWindowTextLengthA(SearchControl);
-				const auto search_text = new char[text_length + 1];
+				const auto text_length = GetWindowTextLengthA(SearchControl) + 1;
+				const auto search_text = new char[text_length];
 				GetWindowTextA(SearchControl, search_text, text_length);
 
 				std::string output_text;

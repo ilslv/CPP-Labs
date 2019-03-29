@@ -66,10 +66,14 @@ event Agency::operator[](const int i) const
 
 void Agency::sort_by_name()
 {
-	std::sort(events_.begin(), events_.end(), [](const event e1, const event e2) -> bool
-	{
-		return e1.name < e2.name;
-	});
+	std::sort(
+		events_.begin(),
+		events_.end(),
+		[](const event& e1, const event& e2) -> bool
+		{
+			return e1.name < e2.name;
+		}
+	);
 }
 
 void Agency::sort_by_date()

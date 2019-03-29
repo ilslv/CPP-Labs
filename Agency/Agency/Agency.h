@@ -14,6 +14,7 @@ class Agency
 {
 	std::vector<event> events_;
 public:
+	using iterator = std::vector<event>::iterator;
 	Agency() = default;
 	Agency(Agency const&) = delete;
 	Agency(Agency&&) = delete;
@@ -22,8 +23,8 @@ public:
 	void book_ticket(int);
 	void sort_by_name();
 	void sort_by_date();
-	std::vector<event>::iterator begin();
-	std::vector<event>::iterator end();
+	iterator begin();
+	iterator end();
 	friend std::ostream& operator<<(std::ostream&, Agency const &);
 	friend std::istream& operator>>(std::istream&, Agency &);
 };
