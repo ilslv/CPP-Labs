@@ -1,18 +1,27 @@
 #include <iostream>
 
+template<typename T>
 class print
 {
+	void(*bar_)(T value);
 public:
-	print operator()(const int input) const
+	explicit print(void(*foo)(T value))
 	{
-		std::cout << input;
+		bar_ = foo;
+	}
+	print operator()(const T input) const
+	{
+		bar_(input);
 		return *this;
 	}
 };
 
 int main()
 {
-	print Print;
+	const print<int> Print([](const int value)
+	{
+		std::cout << value;
+	});
 	Print(42)(24)(45)(36);
 	system("pause");
 	return 0;
