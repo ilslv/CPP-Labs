@@ -117,14 +117,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Agency.h" />
+    <ClInclude Include="railway.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Agency.cpp" />
+    <ClCompile Include="railway.cpp" />
     <ClCompile Include="gui.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="concerts.csv" />
+    <None Include="trains.csv" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

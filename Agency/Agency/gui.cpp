@@ -7,9 +7,9 @@ processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 #include <atlstr.h>
 #include <string>
 #include <fstream>
-#include "Agency.h"
 #include <sstream>
 #include <iomanip>
+#include "railway.h"
 
 bool is_date_in_range(tm from, tm to, tm val)
 {
@@ -19,13 +19,13 @@ bool is_date_in_range(tm from, tm to, tm val)
 
 int CALLBACK wWinMain(const HINSTANCE hInstance, HINSTANCE, PWSTR lpCmdLine, const int nShowCmd)
 {
-	static Agency agency;
-	std::ifstream file("concerts.csv");
+	static railway station;
+	std::ifstream file("trains.csv");
 	while (!file.eof())
 	{
-		file >> agency;
+		file >> station;
 	}
-	agency.sort_by_date();
+	station.sort_by_date();
 
 	static HWND SearchControl, OutputControl, FromDateControl, ToDateControl;
 	MSG msg{};
@@ -81,14 +81,16 @@ int CALLBACK wWinMain(const HINSTANCE hInstance, HINSTANCE, PWSTR lpCmdLine, con
 				GetWindowTextA(SearchControl, search_text, text_length);
 
 				std::string output_text;
-				char date[20];
+				char start_date[20], end_date[20];
 
-				for (const auto& e : agency)
+				for (const auto& t : station)
 				{
-					if ((text_length == 0 || e.name.find(search_text) != std::string::npos) && is_date_in_range(date_from, date_to, e.date))
+					if ((text_length == 0 || t.end_city.find(search_text) || t.start_city.find(search_text) != std::string::npos) 
+						&& is_date_in_range(date_from, date_to, t.start_time))
 					{
-						strftime(date, 20, "%b %d %Y %H:%M", &(e.date));
-						output_text += e.name + "\r\t" + date + "\r\n";
+						strftime(start_date, 20, "%b %d %Y %H:%M", &(t.start_time));
+						strftime(end_date, 20, "%b %d %Y %H:%M", &(t.end_time));
+						output_text += t.start_city + "\r\t" + start_date + "\r\t" + t.end_city + "\r\t" + end_date + "\n";
 					}
 				}
 				SetWindowTextA(OutputControl, output_text.c_str());
