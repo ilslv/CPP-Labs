@@ -4,8 +4,8 @@
 #include <iostream>
 #include "../../../integral_examples.h"
 
-void mpi_monte_carlo_integral(double(*f)(double), const double x_min, const double x_max, const double y_min,
-	const double y_max, const int n, double& result)
+void mpi_monte_carlo_integral(double (*f)(double), const double x_min, const double x_max, const double y_min,
+                              const double y_max, const int n, double& result)
 {
 	int rank, size, in_box = 0;
 	std::random_device rd;
@@ -32,7 +32,7 @@ void mpi_monte_carlo_integral(double(*f)(double), const double x_min, const doub
 	}
 }
 
-void mpi_simpsons_integral(double(*f)(double), const double x_from, const double x_to, const int n, double& result)
+void mpi_simpsons_integral(double (*f)(double), const double x_from, const double x_to, const int n, double& result)
 {
 	int rank, size;
 	MPI_Comm_size(MPI_COMM_WORLD, &size);
@@ -49,7 +49,7 @@ void mpi_simpsons_integral(double(*f)(double), const double x_from, const double
 	MPI_Reduce(&thread_result, &result, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
 }
 
-void mpi_gaussian_integral(double(*f)(double), const double x_from, const double x_to, const int n, double& result)
+void mpi_gaussian_integral(double (*f)(double), const double x_from, const double x_to, const int n, double& result)
 {
 	int rank, size;
 	MPI_Comm_size(MPI_COMM_WORLD, &size);
@@ -60,8 +60,8 @@ void mpi_gaussian_integral(double(*f)(double), const double x_from, const double
 	const auto w1 = 128. / 225;
 	const auto w2 = (322. + 13. * sqrt(70.)) / 900.;
 	const auto w3 = (322. - 13. * sqrt(70.)) / 900.;
-	const double x[]{ 0, x1, -1. * x1, x2, -1. * x2 };
-	const double w[]{ w1, w2, w2, w3, w3 };
+	const double x[]{0, x1, -1. * x1, x2, -1. * x2};
+	const double w[]{w1, w2, w2, w3, w3};
 
 	const auto delta = (x_to - x_from) / n;
 	const int number_of_iterations = ceil(1. * n / size);
