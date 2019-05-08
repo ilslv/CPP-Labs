@@ -2,7 +2,7 @@
 #include <cmath>
 #include <random>
 #include <iostream>
-#include "../../../integral_examples.h"
+#include "../../integral_examples.h"
 
 void mpi_monte_carlo_integral(double (*f)(double), const double x_min, const double x_max, const double y_min,
                               const double y_max, const int n, double& result)
