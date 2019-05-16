@@ -27,7 +27,14 @@ namespace UnitTest
 		{
 			matrix<double> m1(1, 1, 4);
 			matrix<double> m2(1, 1, 3);
-			Assert::IsFalse(are_matrices_equal(m1*m2, matrix<double>(1, 1, 12), 1, 1));
+			Assert::IsTrue(are_matrices_equal(m1*m2, matrix<double>(1, 1, 12), 1, 1));
+		}
+		TEST_METHOD(TestMethod2)
+		{
+			matrix<double> m1(2,2,4);
+			matrix<double> m2(2,2,3);
+			matrix<double> m3(2,2,24);
+			Assert::IsTrue(are_matrices_equal(m1*m2, m3, 2, 2));
 		}
 
 	};
