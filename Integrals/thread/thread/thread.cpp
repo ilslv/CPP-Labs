@@ -5,6 +5,7 @@
 #include <random>
 #include <cmath>
 #include "../../integral_examples.h"
+#include <iomanip>
 
 double thread_monte_carlo_integral(double (*f)(double), const double x_min, const double x_max, const double y_min,
                                    const double y_max, const int n, const int number_of_threads)
@@ -43,12 +44,12 @@ double thread_simpsons_integral(double(*f)(double), const double x_from, const d
 {
 	std::atomic<double> result(0);
 	std::vector<std::thread> threads;
-	threads.reserve(number_of_threads);
 	const auto delta = (x_to - x_from) / n;
 	const int number_of_iterations = ceil(1. * n / number_of_threads);
+	threads.reserve(number_of_threads);
 	for(auto i = 0; i < number_of_threads; i++)
 	{
-		threads.emplace_back(std::thread([&]()
+		threads.emplace_back([&]()
 		{
 			auto start = x_from + delta * number_of_iterations * i;
 			double thread_result = 0;
@@ -58,7 +59,7 @@ double thread_simpsons_integral(double(*f)(double), const double x_from, const d
 				start += delta;
 			}
 			result = result + thread_result;
-		}));
+		});
 	}
 	for (auto i = 0; i < number_of_threads; i++)
 	{
@@ -114,9 +115,51 @@ double thread_gaussian_integral(double(*f)(double), const double x_from, const d
 
 int main()
 {
-	const auto number_of_threads = 8;
-	std::cout << thread_monte_carlo_integral(f1, 0, exp(1), 0, 30, 1000000, number_of_threads) << " " <<
-				 thread_simpsons_integral(f1, 0, exp(1), 1000000, number_of_threads) << " " <<
-				 thread_gaussian_integral(f1, 0, exp(1), 1000000, number_of_threads);
+	const int number_of_threads = 16;
+	int n = 1;
+
+	double res_min, res_avg, res_max,
+		time_min, time_avg, time_max,
+		err_min, err_avg, err_max,
+		val = 14.1542622414793;
+
+	clock_t begin = clock();
+	res_min = res_avg = res_max = thread_monte_carlo_integral(f1, 0, exp(1), 0, 20, n, number_of_threads);
+	clock_t end = clock();
+	time_min = time_avg = time_max = double(end - begin) / CLOCKS_PER_SEC;
+	err_min = err_avg = err_max = abs(res_min - val);
+
+	for (auto i = 1; i < 20; ++i)
+	{
+		begin = clock();
+		double cur_res = thread_monte_carlo_integral(f1, 0, exp(1), 0, 20, n, number_of_threads);
+		end = clock();
+
+		res_avg += cur_res;
+		if (res_min > cur_res)
+			res_min = cur_res;
+		if (res_max < cur_res)
+			res_max = cur_res;
+
+		double cur_time = double(end - begin) / CLOCKS_PER_SEC;
+		time_avg += cur_time;
+		if (time_min > cur_time)
+			time_min = cur_time;
+		if (time_max < cur_time)
+			time_max = cur_time;
+
+		double cur_err = abs(cur_res - val);
+		err_avg += cur_err;
+		if (err_min > cur_err)
+			err_min = cur_err;
+		if (err_max < cur_err)
+			err_max = cur_err;
+
+	}
+	res_avg /= 20;
+	time_avg /= 20;
+	err_avg /= 20;
+	std::cout << std::setprecision(15) <<
+		time_min << "\n" << time_avg << "\n" << time_max << "\n";
 	return 0;
 }

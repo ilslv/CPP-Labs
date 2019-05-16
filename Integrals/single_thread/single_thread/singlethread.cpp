@@ -1,6 +1,8 @@
 #include <iostream>
 #include <random>
 #include "../../integral_examples.h"
+#include <iomanip>
+#include <ctime>
 
 double monte_carlo_integral(double(*f)(double), const double x_min, const double x_max, const double y_min,
 	const double y_max, const int n)
@@ -61,9 +63,37 @@ double gaussian_integral(double(*f)(double), const double x_from, const double x
 	return result;
 }
 
-int main() {
-	std::cout << monte_carlo_integral(f1, 0, exp(1), 0, 30, 1000000) << " " <<
-				 simpson_integral(f1, 0, exp(1), 1000000) << " " <<
-				 gaussian_integral(f1, 0, exp(1), 1000000) << std::endl;
+int main()
+{
+	//int n = 100000000;
+	//clock_t begin = clock();
+	//auto result = monte_carlo_integral(f1, 0, exp(1), 0, 30, n);
+	//clock_t end = clock();
+	//std::cout << std::setprecision(20) << result << " " << double(end - begin) / CLOCKS_PER_SEC << std::endl;
+	//begin = clock();
+	//result = simpson_integral(f1, 0, exp(1), n);
+	//end = clock();
+	//std::cout << std::setprecision(20) << result << " " << double(end - begin) / CLOCKS_PER_SEC << std::endl;
+	//begin = clock();
+	//result = gaussian_integral(f1, 0, exp(1), n);
+	//end = clock();
+	//std::cout << std::setprecision(20) << result << " " << double(end - begin) / CLOCKS_PER_SEC << std::endl;
+
+	int n = 100000;
+
+	double res_min, res_avg, res_max, 
+	time_min, time_avg, time_max, 
+	err_min, err_avg, err_max, 
+	val = 14.1542622414793;
+	
+	clock_t begin = clock();
+	res_min = res_avg = res_max = simpson_integral(f1, 0, exp(1), n);
+	clock_t end = clock();
+	time_min = time_avg = time_max = double(end - begin) / CLOCKS_PER_SEC;
+	err_min = err_avg = err_max = abs(res_min - val);
+	std::cout << std::setprecision(15) <<
+		res_min << "\n" << res_avg << "\n" << res_max << "\n" <<
+		time_min << "\n" << time_avg << "\n" << time_max << "\n" <<
+		err_min << "\n" << err_avg << "\n" << err_max << "\n";
 	return 0;
 }

@@ -3,9 +3,10 @@
 #include <random>
 #include <iostream>
 #include "../../integral_examples.h"
+#include <iomanip>
 
-void mpi_monte_carlo_integral(double (*f)(double), const double x_min, const double x_max, const double y_min,
-                              const double y_max, const int n, double& result)
+double mpi_monte_carlo_integral(double (*f)(double), const double x_min, const double x_max, const double y_min,
+                              const double y_max, const int n)
 {
 	int rank, size, in_box = 0;
 	std::random_device rd;
@@ -26,15 +27,13 @@ void mpi_monte_carlo_integral(double (*f)(double), const double x_min, const dou
 	}
 	int resulting_in_box;
 	MPI_Reduce(&in_box, &resulting_in_box, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
-	if (rank == 0)
-	{
-		result = resulting_in_box / (ceil(1. * n / size) * size) * (x_max - x_min) * (y_max - y_min);
-	}
+	return resulting_in_box / (ceil(1. * n / size) * size) * (x_max - x_min) * (y_max - y_min);
 }
 
-void mpi_simpsons_integral(double (*f)(double), const double x_from, const double x_to, const int n, double& result)
+double mpi_simpsons_integral(double (*f)(double), const double x_from, const double x_to, const int n)
 {
 	int rank, size;
+	double result;
 	MPI_Comm_size(MPI_COMM_WORLD, &size);
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 	const auto delta = (x_to - x_from) / n;
@@ -47,11 +46,13 @@ void mpi_simpsons_integral(double (*f)(double), const double x_from, const doubl
 		start += delta;
 	}
 	MPI_Reduce(&thread_result, &result, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+	return result;
 }
 
-void mpi_gaussian_integral(double (*f)(double), const double x_from, const double x_to, const int n, double& result)
+double mpi_gaussian_integral(double (*f)(double), const double x_from, const double x_to, const int n)
 {
 	int rank, size;
+	double result;
 	MPI_Comm_size(MPI_COMM_WORLD, &size);
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
@@ -80,34 +81,94 @@ void mpi_gaussian_integral(double (*f)(double), const double x_from, const doubl
 		start += delta;
 	}
 	MPI_Reduce(&thread_result, &result, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+	return result;
 }
 
 int main()
 {
+	//MPI_Init(nullptr, nullptr);
+	//int rank;
+	//MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+	//double result;
+	//auto start_time = MPI_Wtime();
+	//mpi_monte_carlo_integral(f1, 0, exp(1), 0, 30, 100000000, result);
+	//auto end_time = MPI_Wtime();
+	//if (rank == 0)
+	//{
+	//	std::cout << result << " " << end_time - start_time << std::endl;
+	//}
+	//start_time = MPI_Wtime();
+	//mpi_simpsons_integral(f1, 0, exp(1), 100000000, result);
+	//end_time = MPI_Wtime();
+	//if (rank == 0)
+	//{
+	//	std::cout << result << " " << end_time - start_time << std::endl;
+	//}
+	//start_time = MPI_Wtime();
+	//mpi_gaussian_integral(f1, 0, exp(1), 100000000, result);
+	//end_time = MPI_Wtime();
+	//if (rank == 0)
+	//{
+	//	std::cout << result << " " << end_time - start_time << std::endl;
+	//}
+	//MPI_Finalize();
+
 	MPI_Init(nullptr, nullptr);
+
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-	double result;
-	auto start_time = MPI_Wtime();
-	mpi_monte_carlo_integral(f1, 0, exp(1), 0, 30, 100000000, result);
-	auto end_time = MPI_Wtime();
-	if (rank == 0)
+
+	int n = 100000000;
+
+	double res_min, res_avg, res_max,
+		time_min, time_avg, time_max,
+		err_min, err_avg, err_max,
+		val = 14.1542622414793;
+
+	auto begin = MPI_Wtime();
+	res_min = res_avg = res_max = mpi_monte_carlo_integral(f1, 0, exp(1), 0, 20, n);
+	auto end = MPI_Wtime();
+	time_min = time_avg = time_max = end - begin;
+	err_min = err_avg = err_max = abs(res_min - val);
+
+	for (auto i = 1; i < 20; ++i)
 	{
-		std::cout << result << " " << end_time - start_time << std::endl;
+		begin = MPI_Wtime();
+		double cur_res = mpi_monte_carlo_integral(f1, 0, exp(1), 0, 20, n);
+		end = MPI_Wtime();
+		
+		if(rank == 0)
+		{
+			res_avg += cur_res;
+			if (res_min > cur_res)
+				res_min = cur_res;
+			if (res_max < cur_res)
+				res_max = cur_res;
+
+			double cur_time = end - begin;
+			time_avg += cur_time;
+			if (time_min > cur_time)
+				time_min = cur_time;
+			if (time_max < cur_time)
+				time_max = cur_time;
+
+			double cur_err = abs(cur_res - val);
+			err_avg += cur_err;
+			if (err_min > cur_err)
+				err_min = cur_err;
+			if (err_max < cur_err)
+				err_max = cur_err;
+		}
 	}
-	start_time = MPI_Wtime();
-	mpi_simpsons_integral(f1, 0, exp(1), 100000000, result);
-	end_time = MPI_Wtime();
-	if (rank == 0)
+	res_avg /= 20;
+	time_avg /= 20;
+	err_avg /= 20;
+	if(rank == 0)
 	{
-		std::cout << result << " " << end_time - start_time << std::endl;
-	}
-	start_time = MPI_Wtime();
-	mpi_gaussian_integral(f1, 0, exp(1), 100000000, result);
-	end_time = MPI_Wtime();
-	if (rank == 0)
-	{
-		std::cout << result << " " << end_time - start_time << std::endl;
+		std::cout << std::setprecision(15) <<
+			res_min << "\n" << res_avg << "\n" << res_max << "\n" <<
+			time_min << "\n" << time_avg << "\n" << time_max << "\n" <<
+			err_min << "\n" << err_avg << "\n" << err_max << "\n";
 	}
 	MPI_Finalize();
 	return 0;

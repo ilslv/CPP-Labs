@@ -3,6 +3,7 @@
 #include <iostream>
 #include <random>
 #include "../../integral_examples.h"
+#include <iomanip>
 
 double pthreads_monte_carlo_integral(double (*f)(double), const double x_min, const double x_max, const double y_min,
                                      const double y_max, const int n, const int number_of_threads)
@@ -159,8 +160,57 @@ double pthreads_gaussian_integral(double (*f)(double), const double x_from, cons
 
 int main()
 {
-	std::cout << pthreads_monte_carlo_integral(f1, 0, exp(1), 0, 30, 1000000, 8) << " " <<
+	/*std::cout << pthreads_monte_carlo_integral(f1, 0, exp(1), 0, 30, 1000000, 8) << " " <<
 				 pthread_simpson_integral(f1, 0, exp(1), 1000000, 8) << " " <<
-				 pthreads_gaussian_integral(f1, 0, exp(1), 10000000, 8) << std::endl;
+				 pthreads_gaussian_integral(f1, 0, exp(1), 10000000, 8) << std::endl;*/
+
+	int n = 1000;
+	int number_of_threads = 16;
+
+	double res_min, res_avg, res_max,
+		time_min, time_avg, time_max,
+		err_min, err_avg, err_max,
+		val = 14.1542622414793;
+
+	clock_t begin = clock();
+	res_min = res_avg = res_max = pthreads_gaussian_integral(f1, 0, exp(1), n, number_of_threads);
+	clock_t end = clock();
+	time_min = time_avg = time_max = double(end - begin) / CLOCKS_PER_SEC;
+	err_min = err_avg = err_max = abs(res_min - val);
+
+	for (auto i = 1; i < 20; ++i)
+	{
+		begin = clock();
+		double cur_res = pthreads_gaussian_integral(f1, 0, exp(1), n, number_of_threads);
+		end = clock();
+
+		res_avg += cur_res;
+		if (res_min > cur_res)
+			res_min = cur_res;
+		if (res_max < cur_res)
+			res_max = cur_res;
+
+		double cur_time = double(end - begin) / CLOCKS_PER_SEC;
+		time_avg += cur_time;
+		if (time_min > cur_time)
+			time_min = cur_time;
+		if (time_max < cur_time)
+			time_max = cur_time;
+
+		double cur_err = abs(cur_res - val);
+		err_avg += cur_err;
+		if (err_min > cur_err)
+			err_min = cur_err;
+		if (err_max < cur_err)
+			err_max = cur_err;
+
+	}
+	res_avg /= 20;
+	time_avg /= 20;
+	err_avg /= 20;
+	std::cout << std::setprecision(15) <<
+		res_min << "\n" << res_avg << "\n" << res_max << "\n" <<
+		time_min << "\n" << time_avg << "\n" << time_max << "\n" <<
+		err_min << "\n" << err_avg << "\n" << err_max << "\n";
 	return 0;
 }
