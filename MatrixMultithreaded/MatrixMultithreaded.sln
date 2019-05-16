@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.28307.421
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MatrixMultithreaded", "MatrixMultithreaded\MatrixMultithreaded.vcxproj", "{2D2A511C-A8C7-4370-BDD7-796BFB392C7D}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UnitTest", "UnitTest\UnitTest.vcxproj", "{53DD15E4-C337-4B00-9969-E79FA1DF7CBA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +23,14 @@ Global
 		{2D2A511C-A8C7-4370-BDD7-796BFB392C7D}.Release|x64.Build.0 = Release|x64
 		{2D2A511C-A8C7-4370-BDD7-796BFB392C7D}.Release|x86.ActiveCfg = Release|Win32
 		{2D2A511C-A8C7-4370-BDD7-796BFB392C7D}.Release|x86.Build.0 = Release|Win32
+		{53DD15E4-C337-4B00-9969-E79FA1DF7CBA}.Debug|x64.ActiveCfg = Debug|x64
+		{53DD15E4-C337-4B00-9969-E79FA1DF7CBA}.Debug|x64.Build.0 = Debug|x64
+		{53DD15E4-C337-4B00-9969-E79FA1DF7CBA}.Debug|x86.ActiveCfg = Debug|Win32
+		{53DD15E4-C337-4B00-9969-E79FA1DF7CBA}.Debug|x86.Build.0 = Debug|Win32
+		{53DD15E4-C337-4B00-9969-E79FA1DF7CBA}.Release|x64.ActiveCfg = Release|x64
+		{53DD15E4-C337-4B00-9969-E79FA1DF7CBA}.Release|x64.Build.0 = Release|x64
+		{53DD15E4-C337-4B00-9969-E79FA1DF7CBA}.Release|x86.ActiveCfg = Release|Win32
+		{53DD15E4-C337-4B00-9969-E79FA1DF7CBA}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
