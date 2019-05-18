@@ -1,0 +1,12 @@
+Graph A and Graph B are isomorphic.
+
+Isomorphism f:V(A)->V(B);
+
+f(1)	=	4
+f(8)	=	5
+f(7)	=	1
+f(2)	=	7
+f(3)	=	3
+f(4)	=	8
+f(5)	=	6
+f(6)	=	2
