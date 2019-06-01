@@ -1,5 +1,8 @@
 #pragma once
 #include <stdexcept>
+#include <vector>
+#include <thread>
+#include <atomic>
 
 template<typename T>
 class matrix
@@ -91,19 +94,40 @@ public:
 
 	matrix operator*(const matrix m)
 	{
+		const auto number_of_threads = 8;
 		if (y_ == m.x_)
 		{
 			matrix res(x_, m.y_, 0);
-			for (auto i = 0; i < x_; i++)
+
+			std::vector<std::thread> threads;
+
+			threads.reserve(number_of_threads);
+
+			for (auto thread_num = 0; thread_num < number_of_threads; thread_num++)
 			{
-				for (auto j = 0; j < m.y_; j++)
+				threads.emplace_back(std::thread([&, thread_num]()
 				{
-					for (auto a = 0; a < y_; a++)
+					const int number_of_cells = ceil(1. * res.x_ * res.y_ / number_of_threads);
+					for(auto i = thread_num * number_of_cells; 
+						i < res.x_ * res.y_ && i < (thread_num + 1) * number_of_cells; 
+						i++
+						)
 					{
-						res[i][j] += m_[i][a] * m.m_[a][j];
+						int x = i / res.x_, y = i % res.y_, result = 0;
+						for(auto j = 0; j < y_; j++)
+						{
+							result += m_[x][j] * m.m_[j][y];
+						}
+						res[x][y] = result;
 					}
-				}
+				}));
 			}
+
+			for (auto& t: threads)
+			{
+				t.join();
+			}
+
 			return res;
 		}
 		throw std::invalid_argument("Wrong dimensions!");
