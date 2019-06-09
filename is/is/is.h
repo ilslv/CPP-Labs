@@ -4,6 +4,34 @@
 
 namespace is
 {
+	namespace
+	{
+		void strcat_m_internal(char*, int) {}
+
+		template<typename First, typename... Param>
+		void strcat_m_internal(char* output, const int buffer, First first, Param... rest)
+		{
+			strcat_s(output, buffer, first);
+			strcat_m_internal(output, buffer, rest...);
+		}
+	}
+
+	template<typename... Param>
+	void strcat_m(char* output, const int buffer, Param... strings)
+	{
+		strcat_m_internal(output, buffer, strings...);
+	}
+
+	void dtoa(const double value, const int precision, char* output, const int buffer)
+	{
+		auto a = int(value);
+		char i[10], f[10];
+		_itoa_s(a, i, 10);
+		_itoa_s(int(double(value - a) * pow(10, precision)), f, 10);
+		strcpy_s(output, buffer, i);
+		strcat_m(output, buffer, ".", f);
+	}
+
 	template<typename T>
 	class array
 	{
@@ -90,7 +118,12 @@ namespace is
 		
 		T& find(const T& key) const
 		{
-			return *static_cast<T*>(bsearch(&key, array_, size_, sizeof(array_[0]), comparator));
+			auto result = static_cast<T*>(bsearch(&key, array_, size_, sizeof(array_[0]), comparator));
+			if(result != nullptr)
+			{
+				return *result;
+			}
+			throw std::invalid_argument("No element found!");
 		}
 
 		T* begin()
@@ -103,24 +136,4 @@ namespace is
 			return array_ + size_;
 		}
 	};
-
-	void strcat_m(char*, int){}
-
-	template<typename First, typename... Param>
-	void strcat_m(char* output, int buffer, First first, Param... rest)
-	{
-		strcat_s(output, buffer, first);
-		strcat_m(output, buffer, rest...);
-	}
-
-	void dtoa(const double value, const int precision, char* output, int buffer)
-	{
-		auto a = int(value);
-		char i[10], f[10];
-		_itoa_s(a, i, 10);
-		_itoa_s(int(double(value - a) * pow(10, precision)), f, 10);
-		strcpy_s(output, buffer, i);
-		strcat_m(output, buffer, ".", f);
-	}
-
 }

@@ -3,8 +3,7 @@
 
 int main()
 {
-	char s[50];
-	s[0] = '\0';
+	char s[50] = "";
 	is::strcat_m(s, 50, "test", "\t", "test1", "\t", "test2");
 	std::cout << s << "\n";
 
