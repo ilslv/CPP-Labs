@@ -1,25 +1,12 @@
 #pragma once
-#include <system_error>
 #include <iostream>
 
 namespace is
 {
-	namespace
+	template<typename... T>
+	void strcat_m(char* output, const int buffer, T... strings)
 	{
-		void strcat_m_internal(char*, int) {}
-
-		template<typename First, typename... Param>
-		void strcat_m_internal(char* output, const int buffer, First first, Param... rest)
-		{
-			strcat_s(output, buffer, first);
-			strcat_m_internal(output, buffer, rest...);
-		}
-	}
-
-	template<typename... Param>
-	void strcat_m(char* output, const int buffer, Param... strings)
-	{
-		strcat_m_internal(output, buffer, strings...);
+		(strcat_s(output, buffer, strings), ...);
 	}
 
 	void dtoa(const double value, const int precision, char* output, const int buffer)
@@ -36,7 +23,7 @@ namespace is
 	class array
 	{
 		T* array_ = nullptr;
-		int size_ = 0;
+		int size_ = 0, filled_ = 0;
 
 		static int comparator(const void* left, const void* right)
 		{
@@ -55,8 +42,9 @@ namespace is
 		array(const array& copy)
 		{
 			size_ = copy.size_;
-			array_ = new T[copy.size_];
-			for (auto i = 0; i < size_; ++i)
+			filled_ = copy.filled_;
+			array_ = new T[copy.filled_];
+			for (auto i = 0; i < filled_; ++i)
 			{
 				array_[i] = copy.array_[i];
 			}
@@ -65,12 +53,14 @@ namespace is
 		array(array&& move) noexcept
 		{
 			size_ = move.size_;
+			filled_ = move.filled_;
 			array_ = move.array_;
 			move.array_ = nullptr;
 		}
 
 		explicit array(const int n)
 		{
+			filled_ = 0;
 			size_ = n;
 			array_ = new T[size_];
 		}
@@ -82,12 +72,12 @@ namespace is
 
 		int get_size() const
 		{
-			return size_;
+			return filled_;
 		}
 
 		T& operator[](const int id) const
 		{
-			if(id < size_ && id >= 0)
+			if(id < filled_ && id >= 0)
 			{
 				return array_[id];
 			}
@@ -96,29 +86,33 @@ namespace is
 
 		void push_back(const T value)
 		{
-			auto tmp = new T[size_ + 1];
-			for (auto i = 0; i < size_; ++i)
+			if (filled_ >= size_)
 			{
-				tmp[i] = array_[i];
+				size_ = (size_ + 1) * 2;
+				auto tmp = new T[size_];
+				for (auto i = 0; i < filled_; ++i)
+				{
+					tmp[i] = array_[i];
+				}
+				array_ = tmp;
 			}
-			tmp[size_] = value;
-			array_ = tmp;
-			size_++;
+			array_[filled_] = value;
+			filled_++;
 		}
 
 		void sort()
 		{
-			qsort(array_, size_, sizeof(array_[0]), comparator);
+			qsort(array_, filled_, sizeof(array_[0]), comparator);
 		}
 
 		void sort_reverse()
 		{
-			qsort(array_, size_, sizeof(array_[0]), comparator_reverse);
+			qsort(array_, filled_, sizeof(array_[0]), comparator_reverse);
 		}
 		
 		T& find(const T& key) const
 		{
-			auto result = static_cast<T*>(bsearch(&key, array_, size_, sizeof(array_[0]), comparator));
+			auto result = static_cast<T*>(bsearch(&key, array_, filled_, sizeof(array_[0]), comparator));
 			if(result != nullptr)
 			{
 				return *result;
@@ -133,7 +127,7 @@ namespace is
 
 		T* end()
 		{
-			return array_ + size_;
+			return array_ + filled_;
 		}
 	};
 }
