@@ -4,14 +4,14 @@
 namespace is
 {
 	template<typename... T>
-	void strcat_m(char* output, const int buffer, T... strings)
+	void strcat_m(char* output, rsize_t buffer, T... strings)
 	{
 		(strcat_s(output, buffer, strings), ...);
 	}
 
 	void dtoa(const double value, const int precision, char* output, const int buffer)
 	{
-		auto a = int(value);
+		const auto a = int(value);
 		char i[10], f[10];
 		_itoa_s(a, i, 10);
 		_itoa_s(int(double(value - a) * pow(10, precision)), f, 10);
@@ -25,16 +25,17 @@ namespace is
 		T* array_ = nullptr;
 		int size_ = 0, filled_ = 0;
 
+		template<typename K>
 		static int comparator(const void* left, const void* right)
 		{
-			if (*(T*)(left) > *(T*)(right)) { return 1; }
-			if (*(T*)(left) == *(T*)(right)) { return 0; }
+			if (*static_cast<const K*>(left) > *static_cast<const T*>(right)) { return 1; }
+			if (*static_cast<const K*>(left) == *static_cast<const T*>(right)) { return 0; }
 			return  -1;
 		}
 
 		static int comparator_reverse(const void* left, const void* right)
 		{
-			return comparator(right, left);
+			return comparator<T>(right, left);
 		}
 	public:
 		array() = default;
@@ -102,17 +103,18 @@ namespace is
 
 		void sort()
 		{
-			qsort(array_, filled_, sizeof(array_[0]), comparator);
+			qsort(array_, filled_, sizeof(array_[0]), comparator<T>);
 		}
 
 		void sort_reverse()
 		{
 			qsort(array_, filled_, sizeof(array_[0]), comparator_reverse);
 		}
-		
-		T& find(const T& key) const
+
+		template<typename K>
+		T& find(const K& key) const
 		{
-			auto result = static_cast<T*>(bsearch(&key, array_, filled_, sizeof(array_[0]), comparator));
+			auto result = static_cast<T*>(bsearch(&key, array_, filled_, sizeof(array_[0]), comparator<K>));
 			if(result != nullptr)
 			{
 				return *result;
