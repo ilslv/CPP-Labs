@@ -4,26 +4,26 @@
 namespace is
 {
 	template<typename... T>
-	void strcat_m(char* output, rsize_t buffer, T... strings)
+	void strcat_m(char* output, const rsize_t size_in_bytes, T... strings)
 	{
-		(strcat_s(output, buffer, strings), ...);
+		(strcat_s(output, size_in_bytes, strings), ...);
 	}
 
-	void dtoa(const double value, const int precision, char* output, const int buffer)
+	void dtoa(char* output, const rsize_t size_in_bytes, const double value, const unsigned precision)
 	{
 		const auto a = int(value);
 		char i[10], f[10];
 		_itoa_s(a, i, 10);
-		_itoa_s(int(double(value - a) * pow(10, precision)), f, 10);
-		strcpy_s(output, buffer, i);
-		strcat_m(output, buffer, ".", f);
+		_itoa_s(int(abs(double(value - a)) * pow(10, precision)), f, 10);
+		strcpy_s(output, size_in_bytes, i);
+		strcat_m(output, size_in_bytes, ".", f);
 	}
 
 	template<typename T>
 	class array
 	{
 		T* array_ = nullptr;
-		int size_ = 0, filled_ = 0;
+		size_t size_ = 0, filled_ = 0;
 
 		template<typename K>
 		static int comparator(const void* left, const void* right)
@@ -59,7 +59,7 @@ namespace is
 			move.array_ = nullptr;
 		}
 
-		explicit array(const int n)
+		explicit array(const unsigned n)
 		{
 			filled_ = 0;
 			size_ = n;
@@ -76,9 +76,9 @@ namespace is
 			return filled_;
 		}
 
-		T& operator[](const int id) const
+		T& operator[](const unsigned id) const
 		{
-			if(id < filled_ && id >= 0)
+			if(id < filled_)
 			{
 				return array_[id];
 			}
@@ -91,7 +91,7 @@ namespace is
 			{
 				size_ = (size_ + 1) * 2;
 				auto tmp = new T[size_];
-				for (auto i = 0; i < filled_; ++i)
+				for (unsigned i = 0; i < filled_; ++i)
 				{
 					tmp[i] = array_[i];
 				}

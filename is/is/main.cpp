@@ -4,10 +4,10 @@
 int main()
 {
 	char s[50] = "";
-	is::strcat_m(s, 50, "test", "\t", "test1", "\t", "test2");
-	std::cout << s << "\n";
+	is::strcat_m(s, 50, "Hello", "\t", "World", "\t", "!", "\n");
+	std::cout << s;
 
-	is::dtoa(3.14, 2, s, 50);
+	is::dtoa(s, 50, -3.14, 3);
 	std::cout << s << "\n";
 
 	is::array<int> a;
@@ -15,7 +15,7 @@ int main()
 	a.push_back(3);
 	a.push_back(7);
 	a.sort();
-	a.find(7) = 0;
+	a.find(7.f) = 0;
 	for(const auto& e : a)
 	{
 		std::cout << e << " ";
