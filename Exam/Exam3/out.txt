@@ -1,0 +1,13 @@
+Alphabet	12.2008	Vitamin	20
+Coldrex	10.2018	Medicine	10
+Doxiciclin	11.2017	Medicine	20
+Multivitamin	05.2028	Vitamin	40
+Alphabet	10.2019	20.3
+Coldrex	10.2018	100.2
+Multivitamin	05.2018	200
+Alphabet	10.2019	Vitamin	20.3	20
+Coldrex	10.2018	Medicine	100.2	10
+Multivitamin	05.2028	Vitamin	200	40
+Alphabet	10.2019	Vitamin	20.3	20
+Coldrex	10.2018	Medicine	100.2	10
+Multivitamin	05.2028	Vitamin	200	40

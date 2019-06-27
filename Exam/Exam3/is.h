@@ -3,48 +3,53 @@
 
 namespace is
 {
-	template<typename... T>
-	void strcat_m(char* output, const rsize_t size_in_bytes, T... strings)
+	namespace
 	{
-		(strcat_s(output, size_in_bytes, strings), ...);
+		void strcat_m_internal(char*, int) {}
+
+		template<typename First, typename... Param>
+		void strcat_m_internal(char* output, const int buffer, First first, Param... rest)
+		{
+			strcat_s(output, buffer, first);
+			strcat_m_internal(output, buffer, rest...);
+		}
 	}
 
-	void dtoa(char* output, const rsize_t size_in_bytes, const double value, const unsigned precision)
+	template<typename... Param>
+	void strcat_m(char* output, const int buffer, Param... strings)
 	{
-		const auto a = int(value);
+		strcat_m_internal(output, buffer, strings...);
+	}
+
+	void dtoa(const double value, const int precision, char* output, const int buffer)
+	{
+		auto a = int(value);
 		char i[10], f[10];
 		_itoa_s(a, i, 10);
-		_itoa_s(int(abs(double(value - a)) * pow(10, precision)), f, 10);
-		strcpy_s(output, size_in_bytes, i);
-		strcat_m(output, size_in_bytes, ".", f);
+		_itoa_s(int(double(value - a) * pow(10, precision)), f, 10);
+		strcpy_s(output, buffer, i);
+		strcat_m(output, buffer, ".", f);
 	}
 
 	template<typename T>
 	class array
 	{
 		T* array_ = nullptr;
-		size_t size_ = 0, filled_ = 0;
+		int size_ = 0, filled_ = 0;
 
-		template<typename K>
 		static int comparator(const void* left, const void* right)
 		{
-			if (*static_cast<const K*>(left) > *static_cast<const T*>(right)) { return 1; }
-			if (*static_cast<const K*>(left) == *static_cast<const T*>(right)) { return 0; }
+			if (*(T*)(left) > *(T*)(right)) { return 1; }
+			if (*(T*)(left) == *(T*)(right)) { return 0; }
 			return  -1;
 		}
 
 		static int comparator_reverse(const void* left, const void* right)
 		{
-			return comparator<T>(right, left);
+			return comparator(right, left);
 		}
 	public:
 		array() = default;
-
-		explicit array(const unsigned n)
-		{
-			size_ = n;
-			array_ = new T[size_];
-		}
 
 		array(const array& copy)
 		{
@@ -65,19 +70,26 @@ namespace is
 			move.array_ = nullptr;
 		}
 
+		explicit array(const int n)
+		{
+			filled_ = 0;
+			size_ = n;
+			array_ = new T[size_];
+		}
+
 		virtual ~array()
 		{
 			delete[] array_;
 		}
 
-		int size() const
+		int get_size() const
 		{
 			return filled_;
 		}
 
-		T& operator[](const unsigned id) const
+		T& operator[](const int id) const
 		{
-			if(id < filled_)
+			if (id < filled_ && id >= 0)
 			{
 				return array_[id];
 			}
@@ -90,7 +102,7 @@ namespace is
 			{
 				size_ = (size_ + 1) * 2;
 				auto tmp = new T[size_];
-				for (unsigned i = 0; i < filled_; ++i)
+				for (auto i = 0; i < filled_; ++i)
 				{
 					tmp[i] = array_[i];
 				}
@@ -102,7 +114,7 @@ namespace is
 
 		void sort()
 		{
-			qsort(array_, filled_, sizeof(array_[0]), comparator<T>);
+			qsort(array_, filled_, sizeof(array_[0]), comparator);
 		}
 
 		void sort_reverse()
@@ -110,11 +122,10 @@ namespace is
 			qsort(array_, filled_, sizeof(array_[0]), comparator_reverse);
 		}
 
-		template<typename K>
-		T& find(const K& key) const
+		T& find(const T& key) const
 		{
-			auto result = static_cast<T*>(bsearch(&key, array_, filled_, sizeof(array_[0]), comparator<K>));
-			if(result != nullptr)
+			auto result = static_cast<T*>(bsearch(&key, array_, filled_, sizeof(array_[0]), comparator));
+			if (result != nullptr)
 			{
 				return *result;
 			}
